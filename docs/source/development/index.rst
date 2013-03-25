@@ -7,3 +7,4 @@ TODO
    :maxdepth: 1
    
    contributing
+   plugins
