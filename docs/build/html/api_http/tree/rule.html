@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>/api/tree/rule &mdash; OpenTDSB 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/solar.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="OpenTDSB 2.0 documentation" href="../../index.html" />
+    <link rel="up" title="/api/tree" href="index.html" />
+    <link rel="next" title="/api/uid" href="../uid/index.html" />
+    <link rel="prev" title="/api/tree" href="index.html" /><link href='http://fonts.googleapis.com/css?family=Source+Code+Pro|Open+Sans:300italic,400italic,700italic,400,300,700' rel='stylesheet' type='text/css'>
+<link href="../../_static/solarized-dark.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../uid/index.html" title="/api/uid"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="/api/tree"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">OpenTDSB 2.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >HTTP API</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">/api/tree</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">/api/tree/rule</a><ul>
+<li><a class="reference internal" href="#verbs">Verbs</a></li>
+<li><a class="reference internal" href="#requests">Requests</a></li>
+<li><a class="reference internal" href="#response">Response</a></li>
+<li><a class="reference internal" href="#get">GET</a><ul>
+<li><a class="reference internal" href="#example-get-query">Example GET Query</a></li>
+<li><a class="reference internal" href="#example-response">Example Response</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#post-put">POST/PUT</a><ul>
+<li><a class="reference internal" href="#example-post-request">Example POST Request</a></li>
+<li><a class="reference internal" href="#id3">Example Response</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#delete">DELETE</a><ul>
+<li><a class="reference internal" href="#example-delete-request">Example DELETE Request</a></li>
+<li><a class="reference internal" href="#id4">Example Response</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">/api/tree</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../uid/index.html"
+                        title="next chapter">/api/uid</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="api-tree-rule">
+<h1>/api/tree/rule</h1>
+<p>Each rule in a tree is an individual object in storage, thus the &#8216;&#8217;/api/tree/rule&#8217;&#8217; endpoint allows for easy modification of a single rule in the set. Rules are addressed by their &#8216;&#8217;tree&#8217;&#8217; ID, &#8216;&#8217;level&#8217;&#8217; and &#8216;&#8217;order&#8217;&#8217; and all requests require these three parameters.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If a manual tree synchronization is running somewhere or there is a large number of TSMeta objects being created or edited, the tree rule may be cached and modifications to a tree&#8217;s rule set may take some time to propagate. If you make any modifications to the rule set, other than to meta information such as the &#8216;&#8217;description&#8217;&#8217; and &#8216;&#8217;notes&#8217;&#8216;, you may want to flush the tree data and perform a manual synchronization so that branches and leaves reflect the new rules.</p>
+</div>
+<div class="section" id="verbs">
+<h2>Verbs</h2>
+<ul class="simple">
+<li>GET - Retrieve one or more rules</li>
+<li>POST - Create or modify a rule</li>
+<li>PUT - Create or replace a rule</li>
+<li>DELETE - Delete a rule</li>
+</ul>
+</div>
+<div class="section" id="requests">
+<h2>Requests</h2>
+<p>The following fields can be used for all rule endpoint requests:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="5%" />
+<col width="5%" />
+<col width="45%" />
+<col width="10%" />
+<col width="5%" />
+<col width="5%" />
+<col width="15%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Data Type</th>
+<th class="head">Required</th>
+<th class="head">Description</th>
+<th class="head">Default</th>
+<th class="head">QS</th>
+<th class="head">RW</th>
+<th class="head">Example</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>tree</td>
+<td>Integer</td>
+<td>Required</td>
+<td>The tree the requested rule belongs to</td>
+<td>&nbsp;</td>
+<td>tree</td>
+<td>RO</td>
+<td>1</td>
+</tr>
+<tr class="row-odd"><td>level</td>
+<td>Integer</td>
+<td>Required</td>
+<td>The level in the rule heirarchy where the rule resides. Must be 0 or greater.</td>
+<td>0</td>
+<td>level</td>
+<td>RW</td>
+<td>2</td>
+</tr>
+<tr class="row-even"><td>order</td>
+<td>Integer</td>
+<td>Required</td>
+<td>The order within a level where the rule resides. Must be 0 or greater.</td>
+<td>0</td>
+<td>order</td>
+<td>RW</td>
+<td>1</td>
+</tr>
+<tr class="row-odd"><td>description</td>
+<td>String</td>
+<td>Optional</td>
+<td>A brief description of the rule&#8217;s purpose</td>
+<td>&nbsp;</td>
+<td>description</td>
+<td>RW</td>
+<td>Split the metric by dot</td>
+</tr>
+<tr class="row-even"><td>notes</td>
+<td>String</td>
+<td>Optional</td>
+<td>Detailed notes about the rule</td>
+<td>&nbsp;</td>
+<td>notes</td>
+<td>RW</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>type</td>
+<td>String</td>
+<td>Required*</td>
+<td>The type of rule represented. Must be one of _________. <a href="#id1"><span class="problematic" id="id2">*</span></a>Required when creating a new rule.</td>
+<td>&nbsp;</td>
+<td>type</td>
+<td>RW</td>
+<td>METRIC</td>
+</tr>
+<tr class="row-even"><td>field</td>
+<td>String</td>
+<td>Optional</td>
+<td>The name of a field for the rule to operate on</td>
+<td>&nbsp;</td>
+<td>field</td>
+<td>RW</td>
+<td>host</td>
+</tr>
+<tr class="row-odd"><td>customField</td>
+<td>String</td>
+<td>Optional</td>
+<td>The name of a &#8216;&#8217;TSMeta&#8217;&#8217; custom field for the rule to operate on. Note that the &#8216;&#8217;field&#8217;&#8217; value must also be configured or an exception will be raised.</td>
+<td>&nbsp;</td>
+<td>custom_field</td>
+<td>RW</td>
+<td>owner</td>
+</tr>
+<tr class="row-even"><td>regex</td>
+<td>String</td>
+<td>Optional</td>
+<td>A regular expression pattern to process the associated field or custom field value through.</td>
+<td>&nbsp;</td>
+<td>regex</td>
+<td>RW</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>separator</td>
+<td>String</td>
+<td>Optional</td>
+<td>If the field value should be split into multiple branches, provide the separation character. Must be one character only.</td>
+<td>&nbsp;</td>
+<td>separator</td>
+<td>RW</td>
+<td>\.</td>
+</tr>
+<tr class="row-even"><td>regexGroupIdx</td>
+<td>Integer</td>
+<td>Optional</td>
+<td>A group index for extracting a portion of a pattern from the given regular expression pattern. Must be 0 or greater.</td>
+<td>0</td>
+<td>regex_group_idx</td>
+<td>RW</td>
+<td>1</td>
+</tr>
+<tr class="row-odd"><td>displayFormat</td>
+<td>String</td>
+<td>Optional</td>
+<td>A display format string to alter the &#8216;&#8217;display_name&#8217;&#8217; value of the resulting branch or leaf. See ______</td>
+<td>&nbsp;</td>
+<td>display_format</td>
+<td>RW</td>
+<td>Port: {ovalue}</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="response">
+<h2>Response</h2>
+<p>A successful response to a <tt class="docutils literal"><span class="pre">GET</span></tt>, <tt class="docutils literal"><span class="pre">POST</span></tt> or <tt class="docutils literal"><span class="pre">PUT</span></tt> request will return the full rule object with optional requested changes. Successful <tt class="docutils literal"><span class="pre">DELETE</span></tt> calls will return with a <tt class="docutils literal"><span class="pre">204</span></tt> status code and no body content. When modifying data, if no changes were present, i.e. the call did not provide any data to store, the resposne will be a <tt class="docutils literal"><span class="pre">304</span></tt> without any body content. If the requested tree or rule did not exist in the system, a <tt class="docutils literal"><span class="pre">404</span></tt> will be returned with an error message. If invalid data was supplied a &#8216;&#8216;400&#8217;&#8217; error will be returned.</p>
+</div>
+<div class="section" id="get">
+<h2>GET</h2>
+<p>A &#8216;&#8217;GET&#8217;&#8217; request requires a specific tree ID, rule level and order. Otherwise a &#8216;&#8216;400&#8217;&#8217; will be returned. To fetch all of the rules for a tree, use the &#8216;&#8217;/api/tree&#8217;&#8217; endpoint with a &#8216;&#8217;tree&#8217; value.</p>
+<div class="section" id="example-get-query">
+<h3>Example GET Query</h3>
+<div class="highlight-python"><pre>http://localhost:4242/api/tree/rule?tree=1&amp;level=0&amp;order=0</pre>
+</div>
+</div>
+<div class="section" id="example-response">
+<h3>Example Response</h3>
+</div>
+</div>
+<div class="section" id="post-put">
+<h2>POST/PUT</h2>
+<p>Using the &#8216;&#8217;POST&#8217;&#8217; or &#8216;&#8217;PUT&#8217;&#8217; methods, you can create a new rule or edit an existing rule. New rules require a &#8216;&#8217;type&#8217;&#8217; value. Existing trees require a valid &#8216;&#8217;tree&#8217;&#8217; ID and any fields that require modification. A successful request will return the modified rule object. Note that if a rule exists at the given level and order, any changes will be merged with or overwrite the existing rule.</p>
+<div class="section" id="example-post-request">
+<h3>Example POST Request</h3>
+<div class="highlight-python"><pre>http://localhost:4242/api/tree/rule?tree=1&amp;level=0&amp;order=0&amp;type=METRIC&amp;separator=.&amp;method=post</pre>
+</div>
+</div>
+<div class="section" id="id3">
+<h3>Example Response</h3>
+</div>
+</div>
+<div class="section" id="delete">
+<h2>DELETE</h2>
+<p>Using the &#8216;&#8217;DELETE&#8217;&#8217; method will remove a rule from a tree.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This method cannot be undone.</p>
+</div>
+<div class="section" id="example-delete-request">
+<h3>Example DELETE Request</h3>
+<div class="highlight-python"><pre>http://localhost:4242/api/tree/rule?tree=1&amp;level=0&amp;order=0&amp;method=delete</pre>
+</div>
+</div>
+<div class="section" id="id4">
+<h3>Example Response</h3>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../uid/index.html" title="/api/uid"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="/api/tree"
+             >previous</a> |</li>
+        <li><a href="../../index.html">OpenTDSB 2.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >HTTP API</a> &raquo;</li>
+          <li><a href="index.html" >/api/tree</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, OpenTSDB.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre.Theme by <a href="http://github.com/vkvn">vkvn</a>
+    </div>
+  </body>
+</html>
