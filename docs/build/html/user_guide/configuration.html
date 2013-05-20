@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <link rel="top" title="OpenTDSB 2.0 documentation" href="../index.html" />
     <link rel="up" title="User Guide" href="index.html" />
-    <link rel="next" title="GUIs" href="guis/index.html" />
+    <link rel="next" title="UIDs and TSUIDs" href="uids.html" />
     <link rel="prev" title="User Guide" href="index.html" /><link href='http://fonts.googleapis.com/css?family=Source+Code+Pro|Open+Sans:300italic,400italic,700italic,400,300,700' rel='stylesheet' type='text/css'>
 <link href="../_static/solarized-dark.css" rel="stylesheet">
   </head>
@@ -36,7 +36,7 @@
           <a href="../genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="guis/index.html" title="GUIs"
+          <a href="uids.html" title="UIDs and TSUIDs"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="index.html" title="User Guide"
@@ -62,8 +62,8 @@
   <p class="topless"><a href="index.html"
                         title="previous chapter">User Guide</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="guis/index.html"
-                        title="next chapter">GUIs</a></p>
+  <p class="topless"><a href="uids.html"
+                        title="next chapter">UIDs and TSUIDs</a></p>
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
@@ -149,19 +149,33 @@ tsd.storage.hbase.zk_quorum - 192.168.1.100</pre>
 <td>False</td>
 <td>&nbsp;</td>
 </tr>
-<tr class="row-even"><td>tsd.core.plugin_path</td>
+<tr class="row-even"><td>tsd.core.meta.enable_tracking</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Whether or not to enable real-time metadata tracking/creation. See <a class="reference internal" href="metadata.html"><em>Metadata</em></a></td>
+<td>False</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>tsd.core.plugin_path</td>
 <td>String</td>
 <td>Optional</td>
 <td>A path to search for plugins when the TSD starts. If the path is invalid, the TSD will fail to start. Plugins can still be enabled if they are in the class path.</td>
 <td>&nbsp;</td>
 <td>&nbsp;</td>
 </tr>
-<tr class="row-odd"><td>tsd.core.timezone</td>
+<tr class="row-even"><td>tsd.core.timezone</td>
 <td>String</td>
 <td>Optional</td>
 <td>A localized timezone identification string used to override the local system timezone used when converting absolute times to UTC when executing a query. This does not affect incoming data timestamps.
 E.g. America/Los_Angeles</td>
 <td>System Configured</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>tsd.core.tree.enable_processing</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Whether or not to enable processing new/edited TSMeta through tree rule sets</td>
+<td>false</td>
 <td>&nbsp;</td>
 </tr>
 <tr class="row-even"><td>tsd.http.cachedir</td>
@@ -347,7 +361,7 @@ E.g.:</p>
           <a href="../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="guis/index.html" title="GUIs"
+          <a href="uids.html" title="UIDs and TSUIDs"
              >next</a> |</li>
         <li class="right" >
           <a href="index.html" title="User Guide"

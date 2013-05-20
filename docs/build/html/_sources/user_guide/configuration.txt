@@ -42,9 +42,11 @@ The following is a table of configuration options for all tools. When applicable
 
    "tsd.core.auto_create_metrics", "Boolean", "Optional", "Whether or not new, incoming metrics will automatically create a new UID. When false, a metric that doesn't match an existing UID will be rejected and will not be written to storage. Tag names and tag values are always created automatically.", "False", "--auto-metric"
    "tsd.core.enable_milliseconds", "Boolean", "Optional", "Whether or not to enable millisecond timestamp support.", "False", ""
+   "tsd.core.meta.enable_tracking", "Boolean", "Optional", "Whether or not to enable real-time metadata tracking/creation. See :doc:`../user_guide/metadata`", "False", ""
    "tsd.core.plugin_path", "String", "Optional", "A path to search for plugins when the TSD starts. If the path is invalid, the TSD will fail to start. Plugins can still be enabled if they are in the class path.", "", ""
    "tsd.core.timezone", "String", "Optional", "A localized timezone identification string used to override the local system timezone used when converting absolute times to UTC when executing a query. This does not affect incoming data timestamps.
    E.g. America/Los_Angeles", "System Configured", ""
+   "tsd.core.tree.enable_processing", "Boolean", "Optional", "Whether or not to enable processing new/edited TSMeta through tree rule sets", "false", ""
    "tsd.http.cachedir", "String", "Required", "The full path to a location where temporary files can be written.
    E.g. /tmp/opentsdb", "", "--cachedir"
    "tsd.http.request.enable_chunked", "Boolean", "Optional", "Whether or not to enable incoming chunk support for the HTTP RPC", "false", ""
