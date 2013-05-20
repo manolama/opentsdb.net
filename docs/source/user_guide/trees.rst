@@ -164,3 +164,86 @@ Not Matched
 ^^^^^^^^^^^
 
 When *strict matching* is enabled for a tree, a TSMeta must match on a rule on every level of the rule set in order to be added to the tree. If one or more levels fail to match, the TSUID will not be added. Similar to *collisions*, a not matched entry will be recorded for every TSUID that failed to be written to the tree. The entry will contain the TSUID and a brief message about which rule and level failed to match.
+
+Examples
+^^^^^^^^
+
+Assume that our TSD has the following timeseries stored:
+
+.. csv-table::
+   :header: "TS#", "Metric", "Tags", "TSUID"
+   :widths: 10, 20, 40, 30
+   
+   "1", "cpu.system", "dc=dal, host=web1.dal.mysite.com", "0102040101"
+   "2", "cpu.system", "dc=dal, host=web2.dal.mysite.com", "0102040102"
+   "3", "cpu.system", "dc=dal, host=web3.dal.mysite.com", "0102040103"
+   "4", "app.connections", "host=web1.dal.mysite.com", "010101"
+   "5", "app.errors", "host=web1.dal.mysite.com, owner=doe", "0101010306"
+   "6", "cpu.system", "dc=lax, host=web1.lax.mysite.com", "0102050101"
+   "7", "cpu.system", "dc=lax, host=web2.lax.mysite.com", "0102050102"
+   "8", "cpu.user", "dc=dal, host=web1.dal.mysite.com", "0202040101"
+   "9", "cpu.user", "dc=dal, host=web2.dal.mysite.com", "0202040102"
+   
+Note that for this example we won't be using any custom value rules so we don't need to show the TSMeta objects, but assume these values populate a TSMeta. Also, the TSUIDs are truncated with 1 byte per UID for illustration purposes.   
+
+Now let's setup a tree with ``strictMatching`` disabled and the following rules: 
+
+.. csv-table::
+   :header: "Level", "Order", "Rule Type", "Field (value)", "Regex", "Separator"
+   :widths: 10, 10, 20, 20, 20, 20
+   
+   "0", "0", "TagK", "dc", "", ""
+   "0", "1", "TagK", "host", ".*\\.(.*)\\.mysite\\.com", ""
+   "1", "0", "TagK", "host", "", "\\\\."
+   "2", "0", "Metric", "", "", "\\\\."
+
+The goal for this set of rules is to order our timeseres by data center, then host, then by metric. Our company may have thousands of servers around the world so it doesn't make sense to display all of them in one branch of the tree, rather we want to group them by data center and let users drill down as needed.
+
+In our example data, we had some old timeseries that didn't have a ``dc`` tag name. However the ``host`` tag does have a fully qualified domain name with the data center name embedded. Thus the first level of our rule set has two rules. The first will look for a ``dc`` tag, and if found, it will use that tag's value and the second rule is skipped. If the ``dc`` tag does not exist, then the second rule will scan the ``host`` tag's value and attempt to extract the data center name from the FQDN. The second level has one rule and that is used to group on the value of the ``host`` tag so that all metrics belonging to that host can be displayed in branches beneath it. The final level has the metric rule that includes a separator to further group the timeseries by the data contained. Since we have multiple CPU and application metrics, all deliniated by a period, it makes sense to add a separator at this point.
+
+Result
+------
+
+The resulting tree would look like this:
+
+
+* dal
+
+  * web1.dal.mysite.com
+  
+    * app
+      
+      * connections (tsuid=010101)
+      * errors (tsuid=0101010306)
+    
+    * cpu
+      
+      * system (tsuid=0102040101)
+      * user (tsuid=0202040101)
+    
+    * web2.dal.mysite.com
+      
+      * cpu
+        
+        * system (tsuid=0102040102)
+        * user (tsuid=0202040102)
+        
+    * web3.dal.mysite.com
+      
+      * cpu
+        
+        * system (tsuid=0102040103)
+
+* lax
+
+  * web1.lax.mysite.com
+    
+    * cpu
+      
+      * system (tsuid=0102050101)
+      
+  * web2.lax.mysite.com
+    
+    * cpu
+      
+      * system (tsuid=0102050102)

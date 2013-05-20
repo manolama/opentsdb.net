@@ -72,6 +72,10 @@
 </li>
 <li><a class="reference internal" href="#collisions">Collisions</a></li>
 <li><a class="reference internal" href="#not-matched">Not Matched</a></li>
+<li><a class="reference internal" href="#examples">Examples</a><ul>
+<li><a class="reference internal" href="#result">Result</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -313,6 +317,179 @@
 <div class="section" id="not-matched">
 <h2>Not Matched</h2>
 <p>When <em>strict matching</em> is enabled for a tree, a TSMeta must match on a rule on every level of the rule set in order to be added to the tree. If one or more levels fail to match, the TSUID will not be added. Similar to <em>collisions</em>, a not matched entry will be recorded for every TSUID that failed to be written to the tree. The entry will contain the TSUID and a brief message about which rule and level failed to match.</p>
+</div>
+<div class="section" id="examples">
+<h2>Examples</h2>
+<p>Assume that our TSD has the following timeseries stored:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="20%" />
+<col width="40%" />
+<col width="30%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">TS#</th>
+<th class="head">Metric</th>
+<th class="head">Tags</th>
+<th class="head">TSUID</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>1</td>
+<td>cpu.system</td>
+<td>dc=dal, host=web1.dal.mysite.com</td>
+<td>0102040101</td>
+</tr>
+<tr class="row-odd"><td>2</td>
+<td>cpu.system</td>
+<td>dc=dal, host=web2.dal.mysite.com</td>
+<td>0102040102</td>
+</tr>
+<tr class="row-even"><td>3</td>
+<td>cpu.system</td>
+<td>dc=dal, host=web3.dal.mysite.com</td>
+<td>0102040103</td>
+</tr>
+<tr class="row-odd"><td>4</td>
+<td>app.connections</td>
+<td>host=web1.dal.mysite.com</td>
+<td>010101</td>
+</tr>
+<tr class="row-even"><td>5</td>
+<td>app.errors</td>
+<td>host=web1.dal.mysite.com, owner=doe</td>
+<td>0101010306</td>
+</tr>
+<tr class="row-odd"><td>6</td>
+<td>cpu.system</td>
+<td>dc=lax, host=web1.lax.mysite.com</td>
+<td>0102050101</td>
+</tr>
+<tr class="row-even"><td>7</td>
+<td>cpu.system</td>
+<td>dc=lax, host=web2.lax.mysite.com</td>
+<td>0102050102</td>
+</tr>
+<tr class="row-odd"><td>8</td>
+<td>cpu.user</td>
+<td>dc=dal, host=web1.dal.mysite.com</td>
+<td>0202040101</td>
+</tr>
+<tr class="row-even"><td>9</td>
+<td>cpu.user</td>
+<td>dc=dal, host=web2.dal.mysite.com</td>
+<td>0202040102</td>
+</tr>
+</tbody>
+</table>
+<p>Note that for this example we won&#8217;t be using any custom value rules so we don&#8217;t need to show the TSMeta objects, but assume these values populate a TSMeta. Also, the TSUIDs are truncated with 1 byte per UID for illustration purposes.</p>
+<p>Now let&#8217;s setup a tree with <tt class="docutils literal"><span class="pre">strictMatching</span></tt> disabled and the following rules:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="10%" />
+<col width="20%" />
+<col width="20%" />
+<col width="20%" />
+<col width="20%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Level</th>
+<th class="head">Order</th>
+<th class="head">Rule Type</th>
+<th class="head">Field (value)</th>
+<th class="head">Regex</th>
+<th class="head">Separator</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>0</td>
+<td>TagK</td>
+<td>dc</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>0</td>
+<td>1</td>
+<td>TagK</td>
+<td>host</td>
+<td>.*\.(.*)\.mysite\.com</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>1</td>
+<td>0</td>
+<td>TagK</td>
+<td>host</td>
+<td>&nbsp;</td>
+<td>\\.</td>
+</tr>
+<tr class="row-odd"><td>2</td>
+<td>0</td>
+<td>Metric</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>\\.</td>
+</tr>
+</tbody>
+</table>
+<p>The goal for this set of rules is to order our timeseres by data center, then host, then by metric. Our company may have thousands of servers around the world so it doesn&#8217;t make sense to display all of them in one branch of the tree, rather we want to group them by data center and let users drill down as needed.</p>
+<p>In our example data, we had some old timeseries that didn&#8217;t have a <tt class="docutils literal"><span class="pre">dc</span></tt> tag name. However the <tt class="docutils literal"><span class="pre">host</span></tt> tag does have a fully qualified domain name with the data center name embedded. Thus the first level of our rule set has two rules. The first will look for a <tt class="docutils literal"><span class="pre">dc</span></tt> tag, and if found, it will use that tag&#8217;s value and the second rule is skipped. If the <tt class="docutils literal"><span class="pre">dc</span></tt> tag does not exist, then the second rule will scan the <tt class="docutils literal"><span class="pre">host</span></tt> tag&#8217;s value and attempt to extract the data center name from the FQDN. The second level has one rule and that is used to group on the value of the <tt class="docutils literal"><span class="pre">host</span></tt> tag so that all metrics belonging to that host can be displayed in branches beneath it. The final level has the metric rule that includes a separator to further group the timeseries by the data contained. Since we have multiple CPU and application metrics, all deliniated by a period, it makes sense to add a separator at this point.</p>
+<div class="section" id="result">
+<h3>Result</h3>
+<p>The resulting tree would look like this:</p>
+<ul class="simple">
+<li>dal<ul>
+<li>web1.dal.mysite.com<ul>
+<li>app<ul>
+<li>connections (tsuid=010101)</li>
+<li>errors (tsuid=0101010306)</li>
+</ul>
+</li>
+<li>cpu<ul>
+<li>system (tsuid=0102040101)</li>
+<li>user (tsuid=0202040101)</li>
+</ul>
+</li>
+<li>web2.dal.mysite.com<ul>
+<li>cpu<ul>
+<li>system (tsuid=0102040102)</li>
+<li>user (tsuid=0202040102)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>web3.dal.mysite.com<ul>
+<li>cpu<ul>
+<li>system (tsuid=0102040103)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>lax<ul>
+<li>web1.lax.mysite.com<ul>
+<li>cpu<ul>
+<li>system (tsuid=0102050101)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>web2.lax.mysite.com<ul>
+<li>cpu<ul>
+<li>system (tsuid=0102050102)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
 </div>
 </div>
 
