@@ -101,6 +101,23 @@ we send datapoints every 15 seconds).
 then they are ignored.  We've included a <code>lib</code> and <code>etc</code> directory
 for library and config data used by all collectors.
 
+<h3>Installation of tcollector</h3>
+
+You need to clone tcollector from GitHub:
+<div class="code">git clone git://github.com/OpenTSDB/tcollector.git</div>
+
+and edit 'tcollector/startstop' script to set following variables:
+<div class="code">TSD_HOST=dns.name.of.tsd
+TCOLLECTOR_PATH=path/to/tcollector
+</div>
+
+<p>
+To avoid having to run <code>mkmetric</code> for every metric that
+tcollector tracks you can to start TSD with the <code>--auto-metric</code>
+flag.  This is useful to get started quickly, but it's not recommended to
+keep this flag in the long term, to avoid accidental metric creation.
+</p>
+
 <h2>Collectors bundled with <code>tcollector</code></h2>
 
 The following are the collectors we've included as part of the base package, together
@@ -110,20 +127,19 @@ include them with your permission in a future release.
 
 <h3><code>0/dfstat.py</code></h3>
 
-These stats from running <code>/usr/bin/df -PlTk</code>
+These stats are similar to ones provided by <code>/usr/bin/df</code> util
 
 <ul>
-<li><code>df.1kblocks.total</code> size of fs
-<li><code>df.1kblocks.used</code>  1K blocks used
-<li><code>df.1kblocks.free</code> 1K blocks available
+<li><code>df.bytes.total</code> total size of data
+<li><code>df.bytes.used</code> bytes used
+<li><code>df.bytes.free</code> bytes free
 <li><code>df.inodes.total</code> total number of inodes
 <li><code>df.inodes.used</code> number of inodes used
 <li><code>df.inodes.free</code> number of inodes free
 </ul>
 These metrics include time series tagged with each mount point and the filesystem's fstype.
-Since TSD doesn't allow slashes in tag values, we substitute <code>/</code> for <code>_</code>.
-This collector also filters out any debugfs, devtmpfs filesystems, as well as any any
-mountpoints mounted under <code>/dev/</code> or <code>/lib/</code>.
+This collector filters out any debugfs, devtmpfs, rpc_pipefs, rootfs filesystems, as well as any any
+mountpoints mounted under <code>/dev/</code>, <code>/lib/</code>, <code>/proc/</code>, and <code>/lib/</code>.
 
 <p>With these tags you can select to graph just a specific filesystem, or all filesystems
 with a particular fstype (e.g. ext3).
