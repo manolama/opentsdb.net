@@ -119,3 +119,5 @@ Some configuration values require special consideration:
   * Unicode characters must be escaped with their hexadecimal representation, e.g.::
   
       my.property = \u0009
+
+.. NOTE:: When a configuration setting with the string "pass" is printed to the log or returning from an API call, the value for that property will be replaced with "\*\*\*\*\*\*\*\*". This is a trivial means of obfuscating passwords.
