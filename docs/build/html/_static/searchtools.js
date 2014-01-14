@@ -244,8 +244,13 @@ var Search = {
   },
 
   loadIndex : function(url) {
-    $.ajax({type: "GET", url: url, data: null, success: null,
-            dataType: "script", cache: true});
+    $.ajax({type: "GET", url: url, data: null,
+            dataType: "script", cache: true,
+            complete: function(jqxhr, textstatus) {
+              if (textstatus != "success") {
+                document.getElementById("searchindexloader").src = url;
+              }
+            }});
   },
 
   setIndex : function(index) {
@@ -325,7 +330,7 @@ var Search = {
           objectterms.push(tmp[i].toLowerCase());
       }
 
-      if ($u.indexOf(stopwords, tmp[i]) != -1 || tmp[i].match(/^\d+$/) ||
+      if ($u.indexOf(stopwords, tmp[i].toLowerCase()) != -1 || tmp[i].match(/^\d+$/) ||
           tmp[i] === "") {
         // skip this "word"
         continue;
@@ -430,16 +435,18 @@ var Search = {
             displayNextItem();
           });
         } else if (DOCUMENTATION_OPTIONS.HAS_SOURCE) {
-          $.get(DOCUMENTATION_OPTIONS.URL_ROOT + '_sources/' +
-                item[0] + '.txt', function(data) {
-            if (data !== '') {
-              listItem.append(Search.makeSearchSummary(data, searchterms, hlterms));
-              Search.output.append(listItem);
-            }
-            listItem.slideDown(5, function() {
-              displayNextItem();
-            });
-          }, "text");
+          $.ajax({url: DOCUMENTATION_OPTIONS.URL_ROOT + '_sources/' + item[0] + '.txt',
+                  dataType: "text",
+                  complete: function(jqxhr, textstatus) {
+                    var data = jqxhr.responseText;
+                    if (data !== '') {
+                      listItem.append(Search.makeSearchSummary(data, searchterms, hlterms));
+                    }
+                    Search.output.append(listItem);
+                    listItem.slideDown(5, function() {
+                      displayNextItem();
+                    });
+                  }});
         } else {
           // no source available, just display title
           Search.output.append(listItem);
@@ -543,7 +550,7 @@ var Search = {
     for (i = 0; i < searchterms.length; i++) {
       var word = searchterms[i];
       // no match but word was a required one
-      if (!(files = terms[word]))
+      if ((files = terms[word]) === undefined)
         break;
       if (files.length === undefined) {
         files = [files];
